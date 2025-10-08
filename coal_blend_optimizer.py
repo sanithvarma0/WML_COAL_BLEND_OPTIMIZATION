@@ -11,7 +11,7 @@ warnings.filterwarnings('ignore')
 # FIXED: Use relative paths instead of hardcoded Windows paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, 'DATA')
-MODELS_DIR = os.path.join(DATA_DIR, 'MODELS')
+MODELS_DIR = os.path.join(BASE_DIR, 'MODELS')
 
 class CoalBlendOptimizer:
     def __init__(self, historical_data_path=None):
@@ -1177,3 +1177,4 @@ def optimize_coal_blend_enhanced(silo_properties, n_historical_starts, n_random_
         'total_attempts': optimization_summary['total_attempts'],
         'successful_attempts': optimization_summary['successful_attempts']
     }
+
