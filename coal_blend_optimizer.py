@@ -5,7 +5,13 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics.pairwise import euclidean_distances
 import joblib
 import warnings
+import os
 warnings.filterwarnings('ignore')
+
+# FIXED: Use relative paths instead of hardcoded Windows paths
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, 'DATA')
+MODELS_DIR = os.path.join(DATA_DIR, 'MODELS')
 
 class CoalBlendOptimizer:
     def __init__(self, historical_data_path=None):
@@ -64,43 +70,43 @@ class CoalBlendOptimizer:
             self.historical_data = None
 
     def rank_by_historical_priority(self, solutions):
-            """
-            Rank solutions with priority for historical matches over random starts
+        """
+        Rank solutions with priority for historical matches over random starts
+        
+        Args:
+            solutions: List of solution dictionaries
             
-            Args:
-                solutions: List of solution dictionaries
-                
-            Returns:
-                Best solution with historical priority
-            """
-            if not solutions:
-                return None
-            
-            # Separate historical and random solutions
-            historical_solutions = [s for s in solutions if s['start_type'] == 'historical']
-            random_solutions = [s for s in solutions if s['start_type'] == 'random']
-            
-            # Case 1: Only one historical solution - return it directly
-            if len(historical_solutions) == 1:
-                best_solution = historical_solutions[0]
-                best_solution['ranking_method'] = 'single_historical_priority'
-                best_solution['historical_priority_used'] = True
-                return best_solution
-            
-            # Case 2: Multiple historical solutions - rank only among historical ones
-            elif len(historical_solutions) > 1:
-                best_solution = self.rank_by_center_values(historical_solutions)
-                best_solution['ranking_method'] = 'multiple_historical_center_values'
-                best_solution['historical_priority_used'] = True
-                best_solution['excluded_random_solutions'] = len(random_solutions)
-                return best_solution
-            
-            # Case 3: No historical solutions - fall back to center values ranking
-            else:
-                best_solution = self.rank_by_center_values(solutions)
-                best_solution['ranking_method'] = 'center_values_no_historical'
-                best_solution['historical_priority_used'] = False
-                return best_solution
+        Returns:
+            Best solution with historical priority
+        """
+        if not solutions:
+            return None
+        
+        # Separate historical and random solutions
+        historical_solutions = [s for s in solutions if s['start_type'] == 'historical']
+        random_solutions = [s for s in solutions if s['start_type'] == 'random']
+        
+        # Case 1: Only one historical solution - return it directly
+        if len(historical_solutions) == 1:
+            best_solution = historical_solutions[0]
+            best_solution['ranking_method'] = 'single_historical_priority'
+            best_solution['historical_priority_used'] = True
+            return best_solution
+        
+        # Case 2: Multiple historical solutions - rank only among historical ones
+        elif len(historical_solutions) > 1:
+            best_solution = self.rank_by_center_values(historical_solutions)
+            best_solution['ranking_method'] = 'multiple_historical_center_values'
+            best_solution['historical_priority_used'] = True
+            best_solution['excluded_random_solutions'] = len(random_solutions)
+            return best_solution
+        
+        # Case 3: No historical solutions - fall back to center values ranking
+        else:
+            best_solution = self.rank_by_center_values(solutions)
+            best_solution['ranking_method'] = 'center_values_no_historical'
+            best_solution['historical_priority_used'] = False
+            return best_solution
 
     def _prepare_similarity_scaler(self):
         """Prepare scaler for silo property similarity matching"""
@@ -388,9 +394,9 @@ class CoalBlendOptimizer:
 
     # ==================== INDIVIDUAL MODEL PREDICTIONS ====================
     def predict_gm_model(self, silo_properties, discharges):
-        """GM% prediction"""
-        gm_model_path  = r"C:\Users\0216697\Downloads\WML_COAL_BLEND_OPTIMIZATION\POC\BLEND_PREDICTION\STREAMLIT_APP\DATA\MODELS\GM\GM_RIDGE_MODEL_V1.joblib"
-        gm_scaler_path = r"C:\Users\0216697\Downloads\WML_COAL_BLEND_OPTIMIZATION\POC\BLEND_PREDICTION\STREAMLIT_APP\DATA\MODELS\GM\GM_RIDGE_SCALER_V1.joblib"
+        """GM% prediction - FIXED with relative paths"""
+        gm_model_path = os.path.join(MODELS_DIR, 'GM', 'GM_RIDGE_MODEL_V1.joblib')
+        gm_scaler_path = os.path.join(MODELS_DIR, 'GM', 'GM_RIDGE_SCALER_V1.joblib')
         gm_features_to_use = ['SILO_1_GM%', 'SILO_2_GM%', 'SILO_3_GM%', 'SILO_4_GM%', 'SILO_5_GM%', 
                              'THEORETICAL_GM%', 'DEVIATION_INDEX', 'DOMINANT_SILO_GM', 'MIXING_PENALTY', 
                              'GM_RANGE', 'DISCHARGE_SKEW']
@@ -401,9 +407,9 @@ class CoalBlendOptimizer:
         return predicted_gm
 
     def predict_ash_model(self, silo_properties, discharges):
-        """Ash% prediction"""
-        ash_model_path  = r"C:\Users\0216697\Downloads\WML_COAL_BLEND_OPTIMIZATION\POC\BLEND_PREDICTION\STREAMLIT_APP\DATA\MODELS\ASH\ASH_RIDGE_MODEL_V1.joblib"
-        ash_scaler_path = r"C:\Users\0216697\Downloads\WML_COAL_BLEND_OPTIMIZATION\POC\BLEND_PREDICTION\STREAMLIT_APP\DATA\MODELS\ASH\ASH_RIDGE_SCALER_V1.joblib"
+        """Ash% prediction - FIXED with relative paths"""
+        ash_model_path = os.path.join(MODELS_DIR, 'ASH', 'ASH_RIDGE_MODEL_V1.joblib')
+        ash_scaler_path = os.path.join(MODELS_DIR, 'ASH', 'ASH_RIDGE_SCALER_V1.joblib')
         ash_features_to_use = ['SILO_1_Ash%', 'SILO_2_Ash%', 'SILO_3_Ash%', 'SILO_4_Ash%', 'SILO_5_Ash%', 
                               'SILO_1_DISCHARGE', 'SILO_2_DISCHARGE', 'SILO_3_DISCHARGE', 'SILO_4_DISCHARGE', 'SILO_5_DISCHARGE', 
                               'SILO_1_USED', 'SILO_2_USED', 'SILO_3_USED', 'SILO_4_USED', 'SILO_5_USED', 'THEORETICAL_Ash%']
@@ -414,9 +420,9 @@ class CoalBlendOptimizer:
         return predicted_ash
 
     def predict_im_model(self, silo_properties, discharges):
-        """IM% prediction"""
-        im_model_path = r"C:\Users\0216697\Downloads\WML_COAL_BLEND_OPTIMIZATION\POC\BLEND_PREDICTION\STREAMLIT_APP\DATA\MODELS\IM\IM_RIDGE_MODEL_V1.joblib"
-        im_scaler_path = r"C:\Users\0216697\Downloads\WML_COAL_BLEND_OPTIMIZATION\POC\BLEND_PREDICTION\STREAMLIT_APP\DATA\MODELS\IM\IM_RIDGE_SCALER_V1.joblib"
+        """IM% prediction - FIXED with relative paths"""
+        im_model_path = os.path.join(MODELS_DIR, 'IM', 'IM_RIDGE_MODEL_V1.joblib')
+        im_scaler_path = os.path.join(MODELS_DIR, 'IM', 'IM_RIDGE_SCALER_V1.joblib')
         im_features_to_use = ['SILO_1_I.M.%', 'SILO_2_I.M.%', 'SILO_3_I.M.%', 'SILO_4_I.M.%', 'SILO_5_I.M.%', 
                              'SILO_1_DISCHARGE', 'SILO_2_DISCHARGE', 'SILO_3_DISCHARGE', 'SILO_4_DISCHARGE', 'SILO_5_DISCHARGE']
         
@@ -426,9 +432,9 @@ class CoalBlendOptimizer:
         return predicted_im
 
     def predict_vm_model(self, silo_properties, discharges):
-        """VM% prediction"""
-        vm_model_path = r"C:\Users\0216697\Downloads\WML_COAL_BLEND_OPTIMIZATION\POC\BLEND_PREDICTION\STREAMLIT_APP\DATA\MODELS\VM\VM_LINEAR_MODEL_V1.joblib"
-        vm_scaler_path = r"C:\Users\0216697\Downloads\WML_COAL_BLEND_OPTIMIZATION\POC\BLEND_PREDICTION\STREAMLIT_APP\DATA\MODELS\VM\VM_LINEAR_SCALER_V1.joblib"
+        """VM% prediction - FIXED with relative paths"""
+        vm_model_path = os.path.join(MODELS_DIR, 'VM', 'VM_LINEAR_MODEL_V1.joblib')
+        vm_scaler_path = os.path.join(MODELS_DIR, 'VM', 'VM_LINEAR_SCALER_V1.joblib')
         vm_features_to_use = ['SILO_1_V.M.%', 'SILO_2_V.M.%', 'SILO_3_V.M.%', 'SILO_4_V.M.%', 'SILO_5_V.M.%', 
                              'SILO_1_DISCHARGE', 'SILO_2_DISCHARGE', 'SILO_3_DISCHARGE', 'SILO_4_DISCHARGE', 'SILO_5_DISCHARGE', 
                              'SILO_1_USED', 'SILO_2_USED', 'SILO_3_USED', 'SILO_4_USED', 'SILO_5_USED', 'THEORETICAL_V.M.%']
@@ -439,9 +445,9 @@ class CoalBlendOptimizer:
         return predicted_vm
 
     def predict_fc_model(self, silo_properties, discharges):
-        """FC% prediction"""
-        fc_model_path = r"C:\Users\0216697\Downloads\WML_COAL_BLEND_OPTIMIZATION\POC\BLEND_PREDICTION\STREAMLIT_APP\DATA\MODELS\FC\FC_LINEAR_MODEL_V1.joblib"
-        fc_scaler_path = r"C:\Users\0216697\Downloads\WML_COAL_BLEND_OPTIMIZATION\POC\BLEND_PREDICTION\STREAMLIT_APP\DATA\MODELS\FC\FC_LINEAR_SCALER_V1.joblib"
+        """FC% prediction - FIXED with relative paths"""
+        fc_model_path = os.path.join(MODELS_DIR, 'FC', 'FC_LINEAR_MODEL_V1.joblib')
+        fc_scaler_path = os.path.join(MODELS_DIR, 'FC', 'FC_LINEAR_SCALER_V1.joblib')
         fc_features_to_use = ["SILO_1_F.C._contrib", "SILO_2_F.C._contrib", "SILO_3_F.C._contrib", 
                              "SILO_4_F.C._contrib", "SILO_5_F.C._contrib", "SILO_1_DISCHARGE%", 
                              "SILO_2_DISCHARGE%", "SILO_3_DISCHARGE%", "SILO_4_DISCHARGE%", "SILO_5_DISCHARGE%"]
@@ -452,9 +458,9 @@ class CoalBlendOptimizer:
         return predicted_fc
 
     def predict_csn_model(self, silo_properties, discharges):
-        """CSN prediction"""
-        csn_model_path = r"C:\Users\0216697\Downloads\WML_COAL_BLEND_OPTIMIZATION\POC\BLEND_PREDICTION\STREAMLIT_APP\DATA\MODELS\CSN\CSN_LINEAR_MODEL_V1.joblib"
-        csn_scaler_path = r"C:\Users\0216697\Downloads\WML_COAL_BLEND_OPTIMIZATION\POC\BLEND_PREDICTION\STREAMLIT_APP\DATA\MODELS\CSN\CSN_LINEAR_SCALER_V1.joblib"
+        """CSN prediction - FIXED with relative paths"""
+        csn_model_path = os.path.join(MODELS_DIR, 'CSN', 'CSN_LINEAR_MODEL_V1.joblib')
+        csn_scaler_path = os.path.join(MODELS_DIR, 'CSN', 'CSN_LINEAR_SCALER_V1.joblib')
         csn_features_to_use = ['SILO_1_CSN', 'SILO_2_CSN', 'SILO_3_CSN', 'SILO_4_CSN', 'SILO_5_CSN']
         
         csn_df = self.build_silo_dataframe(silo_properties, discharges)
@@ -952,6 +958,7 @@ def optimize_coal_blend_enhanced(silo_properties, n_historical_starts, n_random_
                                 use_enhanced_multi_start=True, verbose=True):
     """
     Enhanced main function to optimize coal blend discharges with all-solutions approach
+    FIXED FOR STREAMLIT CLOUD DEPLOYMENT
     
     Returns solutions categorized by satisfaction level following the 4-case logic:
     Case 1: Single combination satisfying all 6 parameters
@@ -961,15 +968,23 @@ def optimize_coal_blend_enhanced(silo_properties, n_historical_starts, n_random_
     
     Args:
         silo_properties: List of 5 dictionaries containing silo properties
+        n_historical_starts: Number of historical starting points
+        n_random_starts: Number of random starting points
         active_silos: List of active silo numbers [1,2,3,4,5] or subset
-        historical_data_path: Path to CSV with filtered historical data (40 rows)
         use_enhanced_multi_start: Use historical + random starting points
         verbose: Print detailed progress
         
     Returns:
         Dictionary with solutions categorized by case logic
     """
-    historical_data_path = r"C:\Users\0216697\Downloads\WML_COAL_BLEND_OPTIMIZATION\POC\BLEND_PREDICTION\STREAMLIT_APP\FINAL_CODE\DATA\HISTORICAL_DATA_COAL_BLEND_OPTIMIZATION_V2.csv"
+    # FIXED: Use relative path instead of hardcoded Windows path
+    historical_data_path = os.path.join(DATA_DIR, 'HISTORICAL_DATA_COAL_BLEND_OPTIMIZATION_V2.csv')
+    
+    # Check if historical data file exists
+    if not os.path.exists(historical_data_path):
+        print(f"Warning: Historical data file not found at {historical_data_path}")
+        print(f"Expected location: {os.path.abspath(historical_data_path)}")
+        historical_data_path = None
     
     # Initialize optimizer with historical data
     optimizer = CoalBlendOptimizer(historical_data_path=historical_data_path)
@@ -1092,10 +1107,12 @@ def optimize_coal_blend_enhanced(silo_properties, n_historical_starts, n_random_
             if solution.get('ranking_method'):
                 if solution['ranking_method'] == 'center_values':
                     print(f"Ranking Method: Center Values (deviation score: {solution['center_deviation_score']:.6f})")
-                    print(f"Selected from {solution['total_perfect_solutions']} perfect solutions")
+                    if solution.get('total_perfect_solutions'):
+                        print(f"Selected from {solution['total_perfect_solutions']} perfect solutions")
                 elif solution['ranking_method'] == 'satisfaction_count_then_objective':
                     print(f"Ranking Method: Satisfaction Count then Objective Value")
-                    print(f"Selected from {solution['total_partial_solutions']} partial solutions")
+                    if solution.get('total_partial_solutions'):
+                        print(f"Selected from {solution['total_partial_solutions']} partial solutions")
             
             print(f"\nOptimal Discharge Values:")
             for i, discharge in enumerate(solution['optimal_discharges'], 1):
