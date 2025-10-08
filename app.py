@@ -500,6 +500,10 @@ def main():
         layout="wide",
         initial_sidebar_state="expanded"
     )
+
+    # Initialize session state for example data flag
+    if 'use_example_data' not in st.session_state:
+        st.session_state['use_example_data'] = False
     
     # Load custom CSS
     load_custom_css()
@@ -569,22 +573,20 @@ def main():
         # Enhanced load example data section
         st.markdown("### 📥 Data Input")
         
-        col_load, col_info = st.columns([1, 2])
-        with col_load:
-            if st.button("🎯 Load Example Data", help="Load sample coal property data"):
-                st.session_state['load_example'] = True
-                st.success("Example data loaded!")
+        # FIXED: Move button outside form and update session state properly
+        if st.button("🎯 Load Example Data", help="Load sample coal property data"):
+            st.session_state['use_example_data'] = True
+            st.rerun()
         
-        with col_info:
-            if st.session_state.get('load_example', False):
-                st.info("📋 Using example coal property values")
+        if st.session_state.get('use_example_data', False):
+            st.info("📋 Using example coal property values")
         
         # Enhanced input form
         with st.form("silo_properties_form"):
             st.markdown("### 🧪 Coal Properties Configuration")
             
             # Default values
-            if st.session_state.get('load_example', False):
+            if st.session_state.get('use_example_data', False):
                 default_values = [
                         # Silo 1
                         {'ash': 9.12, 'im': 0.62, 'vm': 23.32, 'gm': 6.41, 'fc': 66.94, 'csn': 8.0},
@@ -956,3 +958,4 @@ def show_alternative_details(alternative_solution, target_ranges, active_silos):
 if __name__ == "__main__":
 
     main()
+
