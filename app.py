@@ -564,12 +564,15 @@ def main():
     with col1:
         st.markdown("### 📥 Data Input")
         
-        # FIXED: Move button outside form and update session state properly
-        if st.button("🎯 Load Example Data", help="Load sample coal property data"):
-            st.session_state['use_example_data'] = True
-            st.rerun()
+        # Use a checkbox instead of button for persistent state
+        use_example = st.checkbox("🎯 Load Example Data", 
+                                  value=st.session_state.get('use_example_data', False),
+                                  help="Load sample coal property data")
         
-        if st.session_state.get('use_example_data', False):
+        # Update session state based on checkbox
+        st.session_state['use_example_data'] = use_example
+        
+        if use_example:
             st.info("📋 Using example coal property values")
         
         # Enhanced input form
@@ -577,7 +580,7 @@ def main():
             st.markdown("### 🧪 Coal Properties Configuration")
             
             # FIXED: Use session state flag that persists
-            if st.session_state.get('use_example_data', False):
+            if use_example:
                 default_values = [
                     # Silo 1
                     {'ash': 9.12, 'im': 0.62, 'vm': 23.32, 'gm': 6.41, 'fc': 66.94, 'csn': 8.0},
@@ -924,3 +927,4 @@ def show_alternative_details(alternative_solution, target_ranges, active_silos):
 
 if __name__ == "__main__":
     main()
+
