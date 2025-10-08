@@ -597,22 +597,6 @@ def main():
                         # Silo 5
                         {'ash': 9.45, 'im': 0.72, 'vm': 20.20, 'gm': 10.96, 'fc': 69.63, 'csn': 1.0}
                     ]
-                
-                # default_values = [
-                #     {'ash': 0.0, 'im': 0.0, 'vm': 0.0, 'gm': 0.0, 'fc': 0.0, 'csn': 0.0},
-                #     {'ash': 7.22, 'im': 0.31, 'vm': 23.7, 'gm': 8.82, 'fc': 68.77, 'csn': 8.5},
-                #     {'ash': 9.8, 'im': 0.31, 'vm': 31.9, 'gm': 10.53, 'fc': 57.99, 'csn': 7.0},
-                #     {'ash': 10.3, 'im': 0.41, 'vm': 24.3, 'gm': 8.64, 'fc': 64.99, 'csn': 9.0},
-                #     {'ash': 10.1, 'im': 0.46, 'vm': 20.5, 'gm': 9.59, 'fc': 68.94, 'csn': 1.0}
-                # ]
-
-                # default_values = [
-                #     {'ash': 11.6, 'im': 0.75, 'vm': 25.7, 'gm': 7.23, 'fc': 61.95, 'csn': 4.5},
-                #     {'ash': 8.09, 'im': 0.69, 'vm': 22.5, 'gm': 9.30, 'fc': 68.72, 'csn': 8.0},
-                #     {'ash': 8.70, 'im': 0.86, 'vm': 31.3, 'gm': 9.21, 'fc': 59.14, 'csn': 7.5},
-                #     {'ash': 9.82, 'im': 0.69, 'vm': 23.8, 'gm': 8.33, 'fc': 65.69, 'csn': 8.5},
-                #     {'ash': 10.20, 'im': 0.92, 'vm': 19.9, 'gm': 8.06, 'fc': 68.98, 'csn': 1.0}
-                # ]
 
             else:
                 default_values = [
@@ -970,4 +954,5 @@ def show_alternative_details(alternative_solution, target_ranges, active_silos):
     st.dataframe(styled_alt_df, use_container_width=True, hide_index=True)
 
 if __name__ == "__main__":
+
     main()
