@@ -32,15 +32,15 @@ def load_custom_css():
     /* Header styling */               
     .main-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 1rem 1rem;  /* Changed from 2rem 1rem */
-    border-radius: 10px;  /* Changed from 15px */
+    padding: 1rem 1rem;
+    border-radius: 10px;
     color: white;
     text-align: center;
-    margin-bottom: 1.5rem;  /* Changed from 2rem */
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);  /* Reduced shadow */
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
     
-    .main-header h3 {  /* Changed from h1 to h3 */
+    .main-header h3 {
     font-size: 2rem;
     font-weight: 700;
     margin: 0;
@@ -48,8 +48,8 @@ def load_custom_css():
     }
     
     .main-header p {
-    font-size: 1rem;  /* Changed from 1.2rem */
-    margin: 0.3rem 0 0 0;  /* Changed from 0.5rem */
+    font-size: 1rem;
+    margin: 0.3rem 0 0 0;
     opacity: 0.9;
     }
     
@@ -156,7 +156,7 @@ def load_custom_css():
     
     /* Tab styling */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 10px;  /* Increased from 8px for more spacing */
+        gap: 10px;
     }
 
     .stTabs [data-baseweb="tab"] {
@@ -164,14 +164,14 @@ def load_custom_css():
         border-radius: 15px;
         color: white;
         font-weight: 600;
-        padding: 10px 22px;  /* Add this line - increases internal padding */
-        min-width: 100px;    /* Add this line - sets minimum width */
-        text-align: center;  /* Add this line - centers the text */
+        padding: 10px 22px;
+        min-width: 100px;
+        text-align: center;
     }
 
-    .stTabs [data-baseweb="tab"] span {  /* Add this new rule */
-        font-size: 16px;     /* Increases font size */
-        white-space: nowrap; /* Prevents text wrapping */
+    .stTabs [data-baseweb="tab"] span {
+        font-size: 16px;
+        white-space: nowrap;
     }
     
     /* Input styling */
@@ -466,17 +466,15 @@ def format_blend_properties(predictions, target_ranges):
 def format_silo_properties(silo_properties):
     data = []
 
-    for silo_dict in silo_properties:   # loop through list of silo dicts
+    for silo_dict in silo_properties:
         for key, value in silo_dict.items():
-            parts = key.split("_")  # e.g. ["SILO", "1", "Ash%"]
-            silo_no = "_".join(parts[:2])  # -> "SILO_1"
-            prop = parts[2]                # -> "Ash%"
-            # Find row for this silo or create new
+            parts = key.split("_")
+            silo_no = "_".join(parts[:2])
+            prop = parts[2]
             row = next((r for r in data if r["SILO_NO"] == silo_no), None)
             if not row:
                 row = {"SILO_NO": silo_no}
                 data.append(row)
-            # Map property names cleanly
             if prop == "Ash%":
                 row["Ash"] = value
             elif prop == "I.M.%":
@@ -489,7 +487,6 @@ def format_silo_properties(silo_properties):
                 row["F.C."] = value
             elif prop == "CSN":
                 row["CSN"] = value
-    # Build dataframe
     df = pd.DataFrame(data, columns=["SILO_NO", "Ash", "I.M.", "V.M.", "G.M.", "F.C.", "CSN"])
     return df.sort_values("SILO_NO").reset_index(drop=True)
 
@@ -500,7 +497,7 @@ def main():
         layout="wide",
         initial_sidebar_state="expanded"
     )
-
+    
     # Initialize session state for example data flag
     if 'use_example_data' not in st.session_state:
         st.session_state['use_example_data'] = False
@@ -529,12 +526,10 @@ def main():
                 key="rand_starts",
                 help="Number of random starting points for optimization"
             )
-            print(f"Historical Starts: {n_historical_starts}, Random Starts: {n_random_starts}")
         
         st.markdown("---")
-        st.markdown("### 🏗️ Active Silos")
+        st.markdown("### 🗃️ Active Silos")
         
-        # Enhanced silo selection with visual indicators
         silo_options = [1, 2, 3, 4, 5]
         active_silos = st.multiselect(
             "Select Active Silos",
@@ -543,11 +538,8 @@ def main():
             help="Choose which silos are available for optimization"
         )
         
-        # Visual indicator for active silos
         if active_silos:
             st.success(f"✅ {len(active_silos)} Silos Active")
-            # for silo in active_silos:
-            #     st.markdown(f"• SILO {silo}")
         else:
             st.error("❌ No Active Silos")
         
@@ -570,7 +562,6 @@ def main():
     col1, col2 = st.columns([3, 1])
     
     with col1:
-        # Enhanced load example data section
         st.markdown("### 📥 Data Input")
         
         # FIXED: Move button outside form and update session state properly
@@ -585,28 +576,26 @@ def main():
         with st.form("silo_properties_form"):
             st.markdown("### 🧪 Coal Properties Configuration")
             
-            # Default values
+            # FIXED: Use session state flag that persists
             if st.session_state.get('use_example_data', False):
                 default_values = [
-                        # Silo 1
-                        {'ash': 9.12, 'im': 0.62, 'vm': 23.32, 'gm': 6.41, 'fc': 66.94, 'csn': 8.0},
-                        # Silo 2
-                        {'ash': 7.66, 'im': 0.48, 'vm': 24.22, 'gm': 9.33, 'fc': 67.64, 'csn': 8.0},
-                        # Silo 3
-                        {'ash': 8.83, 'im': 0.92, 'vm': 32.72, 'gm': 11.76, 'fc': 57.53, 'csn': 7.5},
-                        # Silo 4
-                        {'ash': 10.15, 'im': 0.66, 'vm': 23.88, 'gm': 9.59, 'fc': 65.31, 'csn': 8.5},
-                        # Silo 5
-                        {'ash': 9.45, 'im': 0.72, 'vm': 20.20, 'gm': 10.96, 'fc': 69.63, 'csn': 1.0}
-                    ]
-
+                    # Silo 1
+                    {'ash': 9.12, 'im': 0.62, 'vm': 23.32, 'gm': 6.41, 'fc': 66.94, 'csn': 8.0},
+                    # Silo 2
+                    {'ash': 7.66, 'im': 0.48, 'vm': 24.22, 'gm': 9.33, 'fc': 67.64, 'csn': 8.0},
+                    # Silo 3
+                    {'ash': 8.83, 'im': 0.92, 'vm': 32.72, 'gm': 11.76, 'fc': 57.53, 'csn': 7.5},
+                    # Silo 4
+                    {'ash': 10.15, 'im': 0.66, 'vm': 23.88, 'gm': 9.59, 'fc': 65.31, 'csn': 8.5},
+                    # Silo 5
+                    {'ash': 9.45, 'im': 0.72, 'vm': 20.20, 'gm': 10.96, 'fc': 69.63, 'csn': 1.0}
+                ]
             else:
                 default_values = [
                     {'ash': 10.0, 'im': 0.8, 'vm': 25.0, 'gm': 8.0, 'fc': 65.0, 'csn': 5.0}
                 ] * 5
             
-            # Enhanced tabs with icons
-            tab_names = [f"🏗️ SILO {i}" for i in range(1, 6)]
+            tab_names = [f"🗃️ SILO {i}" for i in range(1, 6)]
             silo_tabs = st.tabs(tab_names)
             
             silo_properties = []
@@ -615,7 +604,6 @@ def main():
                 defaults = default_values[i-1] if i <= len(default_values) else default_values[0]
                 
                 with tab:
-                    # Status indicator for each silo
                     if i in active_silos:
                         st.success(f"✅ SILO {i} - ACTIVE")
                     else:
@@ -635,7 +623,6 @@ def main():
                         fc = st.number_input(f"🔗 F.C.% (SILO_{i})", min_value=0.0, max_value=100.0, value=defaults['fc'], step=0.1, key=f"silo_{i}_fc")
                         csn = st.number_input(f"🏭 CSN (SILO_{i})", min_value=0.0, max_value=10.0, value=defaults['csn'], step=0.1, key=f"silo_{i}_csn")
                     
-                    # Create silo property dictionary
                     silo_props = {
                         f'SILO_{i}_Ash%': ash,
                         f'SILO_{i}_I.M.%': im,
@@ -646,13 +633,11 @@ def main():
                     }
                     silo_properties.append(silo_props)
             
-            # Enhanced submit button
             submitted = st.form_submit_button("🚀 Optimize Coal Blend", type="primary", use_container_width=True)
     
     with col2:
         st.markdown("### 📊 System Overview")
         
-        # Create overview cards
         if active_silos:
             create_metric_card("Active Silos", len(active_silos), "success")
         else:
@@ -667,7 +652,6 @@ def main():
             st.error("❌ Please select at least one active silo!")
             return
         
-        # Enhanced input summary with visualization
         st.markdown("---")
         st.markdown("### 📋 Input Data Summary")
         
@@ -678,12 +662,10 @@ def main():
             st.dataframe(input_df, use_container_width=True, hide_index=True, height=400)
         
         with col_chart:
-            # Create radar chart for silo comparison
             radar_fig = create_silo_visualization(silo_properties)
             radar_fig.update_layout(height=400)
             st.plotly_chart(radar_fig, use_container_width=True)
         
-        # Enhanced optimization process
         with st.spinner("🔄 Running advanced optimization..."):
             progress_bar = st.progress(0)
             status_text = st.empty()
@@ -699,12 +681,10 @@ def main():
                 else:
                     status_text.text("✅ Finalizing results...")
                 
-                # Small delay to show progress
                 import time
                 time.sleep(0.01)
             
             try:
-                # Call the optimization function
                 result, logs = capture_output(
                     optimize_coal_blend_enhanced,
                     silo_properties=silo_properties,
@@ -718,18 +698,20 @@ def main():
                 progress_bar.empty()
                 status_text.empty()
                 
-                # Enhanced results display
                 if result is None:
                     st.error("❌ Optimization function returned None")
                     st.text("Check the debug logs for error details")
+                    with st.expander("Debug Logs"):
+                        st.text(logs)
                 elif not result.get('success', False):
                     st.error("❌ No acceptable solutions found")
                     st.warning("No solutions satisfied at least 3 parameters.")
                     if 'optimization_summary' in result:
                         st.write(f"Total attempts: {result['optimization_summary'].get('total_attempts', 0)}")
                         st.write(f"Successful attempts: {result['optimization_summary'].get('successful_attempts', 0)}")
+                    with st.expander("Debug Logs"):
+                        st.text(logs)
                 else:
-                    # Enhanced results display
                     display_optimization_results(result, logs, n_historical_starts, n_random_starts, silo_properties)
                 
             except Exception as e:
@@ -752,11 +734,9 @@ def display_optimization_results(result, logs, n_historical_starts, n_random_sta
     
     selected_solution = result['selected_solution']
     
-    # Enhanced results header
     st.markdown("---")
     st.markdown("## 🎯 Optimization Results")
     
-    # Enhanced summary metrics
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
@@ -781,7 +761,6 @@ def display_optimization_results(result, logs, n_historical_starts, n_random_sta
     
     st.markdown("<div class='section-spacing'></div>", unsafe_allow_html=True)
     
-    # Enhanced discharge visualization
     st.markdown("### 📊 Optimal Discharge Distribution")
     
     col_chart, col_table = st.columns([2, 1])
@@ -805,13 +784,11 @@ def display_optimization_results(result, logs, n_historical_starts, n_random_sta
     
     st.markdown("<div class='section-spacing'></div>", unsafe_allow_html=True)
     
-    # Properties table with enhanced formatting
     blend_properties = format_blend_properties(
         selected_solution['evaluation']['predictions'], 
         target_ranges
     )
     
-    # Color-code the dataframe
     def color_status(val):
         if val == 'SUCCESS':
             return 'background-color: #28a745; color: white; font-weight: bold'
@@ -823,10 +800,8 @@ def display_optimization_results(result, logs, n_historical_starts, n_random_sta
     styled_df = blend_df.style.applymap(color_status, subset=['Status'])
     st.dataframe(styled_df, use_container_width=True, hide_index=True)
     
-    # Enhanced process logs
     with st.expander("📋 Detailed Process Logs", expanded=False):
         
-        # Process summary
         st.markdown("#### 🔍 Optimization Summary")
         
         summary_cols = st.columns(4)
@@ -839,17 +814,14 @@ def display_optimization_results(result, logs, n_historical_starts, n_random_sta
         with summary_cols[3]:
             st.metric("Success Rate", f"{(result['successful_attempts']/result['total_attempts']*100):.1f}%")
         
-        # Historical data usage
         if result['historical_data_used']:
             st.success("✅ Historical data was successfully utilized")
         else:
             st.warning("⚠️ No historical data available - using random starts only")
         
-        # Detailed logs
         st.markdown("#### 📝 Process Log Details")
         st.text_area("", logs, height=300, key="process_logs")
         
-        # Additional statistics if available
         if 'optimization_summary' in result:
             st.markdown("#### 📊 Additional Statistics")
             summary = result['optimization_summary']
@@ -865,25 +837,22 @@ def display_optimization_results(result, logs, n_historical_starts, n_random_sta
                 if 'iterations' in summary:
                     st.metric("Total Iterations", summary['iterations'])
     
-    # Alternative solutions section
     if 'alternative_solutions' in result and result['alternative_solutions']:
         st.markdown("<div class='section-spacing'></div>", unsafe_allow_html=True)
         st.markdown("### 🔄 Alternative Solutions")
         
-        alt_solutions = result['alternative_solutions'][:3]  # Show top 3 alternatives
+        alt_solutions = result['alternative_solutions'][:3]
         
         for i, alt_sol in enumerate(alt_solutions, 1):
             with st.expander(f"Alternative Solution {i} - {alt_sol['satisfied_count']}/6 parameters satisfied"):
                 show_alternative_details(alt_sol, target_ranges, result['active_silos'])
     
-    # Export results section
     st.markdown("<div class='section-spacing'></div>", unsafe_allow_html=True)
     st.markdown("### 💾 Export Results")
     
     export_cols = st.columns(3)
     
     with export_cols[0]:
-        # Create export data
         export_data = {
             'Optimization Results': {
                 'Solution Quality': f"{selected_solution['satisfied_count']}/6 parameters satisfied",
@@ -901,7 +870,6 @@ def display_optimization_results(result, logs, n_historical_starts, n_random_sta
             st.json(export_data)
     
     with export_cols[1]:
-        # Create CSV export
         csv_data = pd.DataFrame([
             {'Parameter': 'Solution_Quality', 'Value': f"{selected_solution['satisfied_count']}/6"},
             {'Parameter': 'Objective_Score', 'Value': selected_solution['objective_value']},
@@ -916,6 +884,7 @@ def display_optimization_results(result, logs, n_historical_starts, n_random_sta
     
     with export_cols[2]:
         if st.button("🔄 Run New Optimization", use_container_width=True):
+            st.session_state['use_example_data'] = False
             st.rerun()
 
 def show_alternative_details(alternative_solution, target_ranges, active_silos):
@@ -936,7 +905,6 @@ def show_alternative_details(alternative_solution, target_ranges, active_silos):
         st.write(f"🎯 Objective Score: {alternative_solution['objective_value']:.6f}")
         st.write(f"🚀 Starting Point: {alternative_solution.get('start_type', 'Unknown')}")
     
-    # Alternative blend properties
     st.markdown("**🧪 Predicted Blend Properties:**")
     alt_blend_properties = format_blend_properties(
         alternative_solution['evaluation']['predictions'], 
@@ -944,7 +912,6 @@ def show_alternative_details(alternative_solution, target_ranges, active_silos):
     )
     alt_blend_df = pd.DataFrame(alt_blend_properties)
     
-    # Apply styling
     def color_alt_status(val):
         if val == 'SUCCESS':
             return 'background-color: #28a745; color: white'
@@ -956,6 +923,4 @@ def show_alternative_details(alternative_solution, target_ranges, active_silos):
     st.dataframe(styled_alt_df, use_container_width=True, hide_index=True)
 
 if __name__ == "__main__":
-
     main()
-
