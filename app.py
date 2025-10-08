@@ -498,10 +498,6 @@ def main():
         initial_sidebar_state="expanded"
     )
     
-    # Initialize session state for example data flag
-    if 'use_example_data' not in st.session_state:
-        st.session_state['use_example_data'] = False
-    
     # Load custom CSS
     load_custom_css()
     
@@ -564,39 +560,23 @@ def main():
     with col1:
         st.markdown("### 📥 Data Input")
         
-        # Use a checkbox instead of button for persistent state
-        use_example = st.checkbox("🎯 Load Example Data", 
-                                  value=st.session_state.get('use_example_data', False),
-                                  help="Load sample coal property data")
-        
-        # Update session state based on checkbox
-        st.session_state['use_example_data'] = use_example
-        
-        if use_example:
-            st.info("📋 Using example coal property values")
-        
         # Enhanced input form
         with st.form("silo_properties_form"):
             st.markdown("### 🧪 Coal Properties Configuration")
             
-            # FIXED: Use session state flag that persists
-            if use_example:
-                default_values = [
-                    # Silo 1
-                    {'ash': 9.12, 'im': 0.62, 'vm': 23.32, 'gm': 6.41, 'fc': 66.94, 'csn': 8.0},
-                    # Silo 2
-                    {'ash': 7.66, 'im': 0.48, 'vm': 24.22, 'gm': 9.33, 'fc': 67.64, 'csn': 8.0},
-                    # Silo 3
-                    {'ash': 8.83, 'im': 0.92, 'vm': 32.72, 'gm': 11.76, 'fc': 57.53, 'csn': 7.5},
-                    # Silo 4
-                    {'ash': 10.15, 'im': 0.66, 'vm': 23.88, 'gm': 9.59, 'fc': 65.31, 'csn': 8.5},
-                    # Silo 5
-                    {'ash': 9.45, 'im': 0.72, 'vm': 20.20, 'gm': 10.96, 'fc': 69.63, 'csn': 1.0}
-                ]
-            else:
-                default_values = [
-                    {'ash': 10.0, 'im': 0.8, 'vm': 25.0, 'gm': 8.0, 'fc': 65.0, 'csn': 5.0}
-                ] * 5
+            # Always use example data as defaults
+            default_values = [
+                # Silo 1
+                {'ash': 9.12, 'im': 0.62, 'vm': 23.32, 'gm': 6.41, 'fc': 66.94, 'csn': 8.0},
+                # Silo 2
+                {'ash': 7.66, 'im': 0.48, 'vm': 24.22, 'gm': 9.33, 'fc': 67.64, 'csn': 8.0},
+                # Silo 3
+                {'ash': 8.83, 'im': 0.92, 'vm': 32.72, 'gm': 11.76, 'fc': 57.53, 'csn': 7.5},
+                # Silo 4
+                {'ash': 10.15, 'im': 0.66, 'vm': 23.88, 'gm': 9.59, 'fc': 65.31, 'csn': 8.5},
+                # Silo 5
+                {'ash': 9.45, 'im': 0.72, 'vm': 20.20, 'gm': 10.96, 'fc': 69.63, 'csn': 1.0}
+            ]
             
             tab_names = [f"🗃️ SILO {i}" for i in range(1, 6)]
             silo_tabs = st.tabs(tab_names)
@@ -927,4 +907,5 @@ def show_alternative_details(alternative_solution, target_ranges, active_silos):
 
 if __name__ == "__main__":
     main()
+
 
